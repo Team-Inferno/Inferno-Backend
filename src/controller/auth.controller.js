@@ -151,7 +151,7 @@ exports.resendToken = async (req, res) => {
 async function sendVerificationEmail(user, req, res) {
   const token = user.generateVerificationToken();
 
-  let subject = "Account Verification Token";
+  let subject = "Account Verification";
   let to = user.email;
   let from = process.env.FROM_EMAIL;
   let link = "http://" + req.headers.host + "/api/auth/verify/" + token.token;

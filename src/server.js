@@ -38,9 +38,9 @@ connection.on("error", (err) => {
 
 //INITIALIZE PASSPORT MIDDLEWARE
 app.use(passport.initialize());
-require("./src/middleware/jwt")(passport);
+require("./middleware/jwt")(passport);
 
-require("./src/route/index.route")(app);
+require("./route/index.route")(app);
 
 
 app.listen(process.env.LOCALHOST_PORT || 8000,()=> {
