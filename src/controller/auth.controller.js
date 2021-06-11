@@ -12,11 +12,14 @@ exports.register = async (req, res) => {
     // Make sure this account doesn't already exist
     const user = await User.findOne({ email });
 
-    if (user)
+    if (user) {
       return res.status(401).json({
-        error:
-          "The email address you have entered is already associated with another account.",
+        error: {
+          email:
+            "The email address you have entered is already associated with another account.",
+        },
       });
+    }
 
     const newUser = new User({ ...req.body });
 
@@ -69,7 +72,9 @@ exports.login = async (req, res) => {
     // Make sure the user has been verified
 
     // Login successful, write token, and send back user
-    res.status(200).json({success: true, jwt: user.generateJWT(), user: user });
+    res
+      .status(200)
+      .json({ success: true, jwt: user.generateJWT(), user: user });
   } catch (error) {
     res.status(500).json({ error: { message: error.message } });
   }

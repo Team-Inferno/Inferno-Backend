@@ -22,7 +22,7 @@ mongoose.promise = global.Promise;
 mongoose.connect(process.env.MONGO_CLOUD_CONN_URL, {
   useNewUrlParser: true,
   useCreateIndex: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
 });
 
 const connection = mongoose.connection;
