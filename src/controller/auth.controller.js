@@ -14,7 +14,7 @@ exports.register = async (req, res) => {
 
     if (user)
       return res.status(401).json({
-        message:
+        error:
           "The email address you have entered is already associated with another account.",
       });
 

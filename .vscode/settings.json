@@ -1,4 +1,4 @@
 {
-    "appService.defaultWebAppToDeploy": "/subscriptions/0b929a54-ad38-46e7-9abb-2068a8753675/resourceGroups/appsvc_linux_centralus_basic/providers/Microsoft.Web/sites/Inferrno",
-    "appService.deploySubpath": "inferno-backend"
+    "appService.defaultWebAppToDeploy": "/subscriptions/0b929a54-ad38-46e7-9abb-2068a8753675/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/Infernolive",
+    "appService.deploySubpath": "."
 }
