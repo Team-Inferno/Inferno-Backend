@@ -21,6 +21,17 @@ exports.register = async (req, res) => {
       });
     }
 
+    user = await User.findOne({ username });
+
+    if (user) {
+      return res.status(401).json({
+        error: {
+          username:
+            "Username already taken",
+        },
+      });
+    }
+
     const newUser = new User({ ...req.body });
 
     await sendVerificationEmail(newUser, req, res);
