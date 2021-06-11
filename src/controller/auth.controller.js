@@ -8,9 +8,11 @@ const sendMail = require("../utils/mail");
 exports.register = async (req, res) => {
   try {
     const { email } = req.body;
+    const { username } = req.body;
+
 
     // Make sure this account doesn't already exist
-    const user = await User.findOne({ email });
+    var user = await User.findOne({ email });
 
     if (user) {
       return res.status(401).json({
