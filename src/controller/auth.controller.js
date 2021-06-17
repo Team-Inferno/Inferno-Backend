@@ -10,8 +10,7 @@ exports.register = async (req, res) => {
     const { email } = req.body;
     const { username } = req.body;
 
-
-    // Make sure this account doesn't already exist
+    // Make sure email doesn't already exist
     var user = await User.findOne({ email });
 
     if (user) {
@@ -23,13 +22,13 @@ exports.register = async (req, res) => {
       });
     }
 
+    // Make sure username doesn't already exist
     user = await User.findOne({ username });
 
     if (user) {
       return res.status(401).json({
         error: {
-          username:
-            "Username already taken",
+          username: "Username already taken",
         },
       });
     }
@@ -65,7 +64,7 @@ exports.login = async (req, res) => {
           email:
             "The email address " +
             email +
-            " is not associated with any account. Double-check your email address and try again.",
+            " is not associated with any account.",
         },
       });
 
