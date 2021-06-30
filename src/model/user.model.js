@@ -40,7 +40,14 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       required: false,
     },
+    server: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Server",
+      },
+    ],
   },
+
   { timestamps: true }
 );
 

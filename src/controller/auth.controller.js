@@ -68,6 +68,7 @@ exports.login = async (req, res) => {
         },
       });
 
+    // Make sure the user has been verified
     if (!user.isVerified)
       return res.status(401).json({
         error: {
@@ -80,8 +81,6 @@ exports.login = async (req, res) => {
       return res
         .status(401)
         .json({ error: { password: "Incorrect password" } });
-
-    // Make sure the user has been verified
 
     // Login successful, write token, and send back user
     res
