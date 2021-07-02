@@ -1,5 +1,6 @@
 const auth = require("./auth.route");
 const user = require("./user.route");
+const server = require("./server.route");
 
 const authenticate = require("../middleware/authenticate");
 
@@ -15,4 +16,5 @@ module.exports = (app) => {
 
   app.use("/api/auth", auth);
   app.use("/api/user", authenticate, user);
+  app.use("/api/server", authenticate, server);
 };

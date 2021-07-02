@@ -9,7 +9,7 @@ module.exports = (req, res, next) => {
         .status(401)
         .json({ message: "Unauthorized Access - No Token Provided!" });
 
-    req.user = user;
+    req.user = { id: user._id, username: user.username, email: user.email };
 
     next();
   })(req, res, next);

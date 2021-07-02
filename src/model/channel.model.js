@@ -1,18 +1,8 @@
 const mongoose = require("mongoose");
 
-const tokenSchema = new mongoose.Schema(
+const baseChannelSchema = new mongoose.Schema(
   {
-    server: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Server",
-    },
-    room: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "Room",
-    },
-    name: {
+    channel_name: {
       type: String,
       required: true,
     },
@@ -21,4 +11,18 @@ const tokenSchema = new mongoose.Schema(
   { discriminatorKey: "type" }
 );
 
-module.exports = mongoose.model("Tokens", tokenSchema);
+const TextChannelSchema = new mongoose.Schema({}, { discriminatorKey: "type" });
+
+const VoiceChannelSchema = new mongoose.Schema(
+  {
+    subscribers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+  },
+  { discriminatorKey: "type" }
+);
+
+module.exports = { baseChannelSchema, TextChannelSchema, VoiceChannelSchema };

@@ -40,7 +40,7 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       required: false,
     },
-    server: [
+    servers: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Server",
