@@ -1,28 +1,12 @@
-const mongoose = require("mongoose");
+const roomSchema = require("./room.schema");
+const channelSchema = require("./channel.schema");
 
-const baseChannelSchema = new mongoose.Schema(
-  {
-    channel_name: {
-      type: String,
-      required: true,
-    },
-  },
-  { timestamps: true },
-  { discriminatorKey: "type" }
-);
 
-const TextChannelSchema = new mongoose.Schema({}, { discriminatorKey: "type" });
+const TextChannel = roomSchema.roomSchema
+  .path("channels")
+  .discriminator("text", channelSchema.TextChannelSchema);
+const VoiceChannel = roomSchema.roomSchema
+  .path("channels")
+  .discriminator("voice", channelSchema.VoiceChannelSchema);
 
-const VoiceChannelSchema = new mongoose.Schema(
-  {
-    subscribers: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-      },
-    ],
-  },
-  { discriminatorKey: "type" }
-);
-
-module.exports = { baseChannelSchema, TextChannelSchema, VoiceChannelSchema };
+module.exports = {TextChannel,VoiceChannel}

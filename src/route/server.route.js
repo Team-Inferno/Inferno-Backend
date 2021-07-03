@@ -1,7 +1,7 @@
 const express = require("express");
 const { check } = require("express-validator");
 
-const {createServer,addMember,renameServer,deleteServer} = require("../controller/server.controller");
+const {createServer,addMember,updateServer,deleteServer, createRoom, createChannel, deleteRoom, deleteChannel} = require("../controller/server.controller");
 const validate = require("../middleware/validate");
 
 const router = express.Router();
@@ -13,9 +13,9 @@ router.get("/", (req, res) => {
 });
 
 router.post(
-  "/add",
+  "/new/server",
   [
-    check("servername")
+    check("server_name")
       .not()
       .isEmpty()
       .withMessage("Enter a valid server name"),
@@ -25,8 +25,35 @@ router.post(
 );
 
 router.post(
-  "/member",
-  [check("userid").not().isEmpty().withMessage("User not valid")],
+  "/new/room",
+  [
+    check("room_name").not().isEmpty().withMessage("Enter a valid room name"),
+    check("server_id").not().isEmpty().withMessage("No server ID provided"),
+  ],
+  validate,
+  createRoom
+);
+
+router.post(
+  "/new/channel",
+  [
+    check("channel_name")
+      .not()
+      .isEmpty()
+      .withMessage("Enter a valid channel name"),
+    check("server_id").not().isEmpty().withMessage("No server ID provided"),
+    check("room_id").not().isEmpty().withMessage("No server ID provided"),
+    check("channel_type").not().isEmpty().withMessage("No channel type provided"),
+  ],
+  validate,
+  createChannel
+);
+
+
+
+router.post(
+  "new/member",
+  [check("user_id").not().isEmpty().withMessage("User not valid")],
   validate,
   addMember
 );
@@ -44,16 +71,39 @@ router.post(
       .withMessage("Enter a valid server name"),
   ],
   validate,
-  renameServer
+  updateServer
 );
 
 router.post(
-  "/delete",
+  "/delete/server",
   [
-    check("serverid").not().isEmpty().withMessage("No server ID provided"),
+    check("server_id").not().isEmpty().withMessage("No server ID provided"),
   ],
   validate,
   deleteServer
 );
+
+router.post(
+  "/delete/room",
+  [
+    check("server_id").not().isEmpty().withMessage("No server ID provided"),
+    check("room_id").not().isEmpty().withMessage("No room ID provided"),
+
+  ],
+  validate,
+  deleteRoom
+);
+
+router.post(
+  "/delete/channel",
+  [
+    check("server_id").not().isEmpty().withMessage("No server ID provided"),
+    check("room_id").not().isEmpty().withMessage("No room ID provided"),
+    check("channel_id").not().isEmpty().withMessage("No channel ID provided"),
+  ],
+  validate,
+  deleteChannel
+);
+
 
 module.exports = router;

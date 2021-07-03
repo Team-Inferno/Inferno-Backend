@@ -10,11 +10,11 @@ module.exports = (app) => {
       .status(200)
       .send({
         message:
-          "Welcome to the AUTHENTICATION API. Register or Login to test Authentication.",
+          "Welcome to Inferno.",
       });
   });
 
   app.use("/api/auth", auth);
   app.use("/api/user", authenticate, user);
-  app.use("/api/server", authenticate, server);
+  app.use("/api/server", server);
 };

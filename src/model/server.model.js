@@ -1,25 +1,6 @@
 const mongoose = require("mongoose");
-const channelSchema = require("../model/channel.model");
-
-const roomSchema = new mongoose.Schema(
-  {
-    room_name: {
-      type: String,
-    },
-
-    channels: [channelSchema.baseChannelSchema],
-  },
-  { timestamps: true }
-);
-
-const TextChannel = roomSchema
-  .path("channels")
-  .discriminator("text", channelSchema.TextChannelSchema);
-const VoiceChannel = roomSchema
-  .path("channels")
-  .discriminator("voice", channelSchema.VoiceChannelSchema);
-
-const Room = mongoose.model("Rooms", roomSchema);
+const { roomSchema, Room } = require("./room.schema");
+const channel = require("./channel.model");
 
 const serverSchema = new mongoose.Schema(
   {
@@ -53,37 +34,27 @@ const serverSchema = new mongoose.Schema(
 serverSchema.pre("save", async function (next) {
   var server = this;
 
-  if (server.isModified(server.rooms)) {
-    next();
+  if (server.isModified("rooms")) {
+    return next();
   }
 
-  await server.rooms.push(new Room({ room_name: "General" }));
-
-  var newTextChannel = new TextChannel({
+  var newTextChannel = new channel.TextChannel({
     channel_name: "text-channel",
   });
 
-  var newVoiceChannel = new VoiceChannel({
+  var newVoiceChannel = new channel.VoiceChannel({
     channel_name: "voice-channel",
     subscribers: [server.owner],
   });
 
-  await server.rooms[0].channels.push(newTextChannel);
-  await server.rooms[0].channels.push(newVoiceChannel);
+  await server.rooms.push(
+    new Room({
+      room_name: "General",
+      channels: [newTextChannel, newVoiceChannel],
+    })
+  );
 
-  console.log(server);
   next();
 });
-
-serverSchema.pre(
-  "remove",
-  { query: true, document: true },
-  async function (next) {
-    var server = this;
-
-    await Channel.deleteMany({ server: server._id });
-    next();
-  }
-);
 
 module.exports = mongoose.model("Servers", serverSchema);

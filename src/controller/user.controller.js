@@ -47,7 +47,6 @@ exports.update = async function (req, res) {
     );
 
     return res.status(200).json({ user, message: "User has been updated" });
-    
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -69,6 +68,34 @@ exports.destroy = async function (req, res) {
 
     await User.findByIdAndDelete(id);
     res.status(200).json({ message: "User has been deleted" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.removeServer = async function (req, res) {
+  try {
+    const userid = req.query.user_id;
+    const serverid = req.query.server_id;
+
+    var user = await User.findOne({ _id: userid });
+
+    if (!user) {
+      return res.status(404).json({ error: true, message: "user not found" });
+    }
+
+    var servers = user.servers;
+    const serverIndex = servers.findIndex((server) => server._id == serverid);
+    if (serverIndex == -1) {
+      return res
+        .status(404)
+        .json({ error: true, message: "user is not a memeber of this server" });
+    }
+    user.servers.splice(serverIndex, 1);
+    await user.save();
+    res
+      .status(200)
+      .json({ error: false, message: "member removed from the server" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
