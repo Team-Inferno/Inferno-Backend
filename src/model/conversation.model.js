@@ -2,22 +2,22 @@ const mongoose = require("mongoose");
 
 const conversationSchema = new mongoose.Schema(
   {
-    channel: {
+    channel_id: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "Channel",
     },
-    sender: {
+    sender_id: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
-    content: {
+    sender_name: {
       type: String,
     },
-    createdAt: {
-      date: Date.now(),
-    },
+    content: {
+      type: String,
+    }
   },
 
   { timestamps: true }

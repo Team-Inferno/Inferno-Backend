@@ -42,8 +42,15 @@ const UserSchema = new mongoose.Schema(
     },
     servers: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Server",
+        server_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Server",
+        },
+        server_name:{
+          type: String,
+          required: true
+        },
+        
       },
     ],
   },
@@ -81,8 +88,6 @@ UserSchema.methods.generateJWT = function () {
     id: this._id,
     email: this.email,
     username: this.username,
-    firstName: this.firstName,
-    lastName: this.lastName,
   };
 
   return jwt.sign(payload, process.env.JWT_SECRET, {

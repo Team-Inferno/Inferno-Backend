@@ -2,23 +2,53 @@ const Server = require("../model/server.model");
 const User = require("../model/user.model");
 const { Room } = require("../model/room.schema");
 const channel = require("../model/channel.model");
+const io = require("../socket");
+
+exports.getServer = async (req, res) => {
+  try {
+    const serverid = req.query.server_id;
+    var server = await Server.findOne({ _id: serverid });
+
+    if (!server) {
+      return res
+        .status(404)
+        .json({ error: true, message: "server doesnt exist" });
+    }
+
+    res.status(200).json(server);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
 
 exports.createServer = async (req, res) => {
   try {
     const servername = req.query.server_name;
     const ownerID = req.user.id;
-    var server = await Server.findOne({ server_name: servername });
 
+    var server = await Server.findOne({ server_name: servername });
     if (server) {
       return res
         .status(404)
         .json({ error: true, message: "server with this name already exists" });
     }
-
     var newServer = new Server({ server_name: servername, owner: ownerID });
-
     await newServer.members.push(ownerID);
     newServer = await newServer.save();
+
+    var user = await User.findOne({ _id: ownerID });
+    if (!user) {
+      return res.status(404).json({ error: true, message: "no user found" });
+    }
+
+    io.to(String(ownerID)).emit("server-added", {
+      server_id: newServer._id,
+      server_name: servername,
+    });
+
+    user.servers.push({ server_id: newServer._id, server_name: servername });
+    await user.save();
 
     res.status(200).json({ message: "Server created", newServer: newServer });
   } catch (error) {
@@ -90,7 +120,11 @@ exports.createChannel = async (req, res) => {
 
     await server.save();
 
-    res.status(200).json({ message: "Channel created", updatedServer: server });
+    res.status(200).json({
+      error: false,
+      message: "Channel created",
+      updatedServer: server,
+    });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: true, message: error.message });
@@ -111,6 +145,17 @@ exports.deleteServer = async (req, res) => {
         .status(404)
         .json({ error: true, message: "Only owner can delete the server" });
     }
+
+    var users = await User.find({ _id: { $in: server.members } });
+    console.log(users);
+    users.map(async (user) => {
+      const serverIndex = user.servers.findIndex(
+        (server) => server._id == serverid
+      );
+      user.servers.splice(serverIndex, 1);
+      var _user = await user.save();
+      io.to(String(_user._id)).emit("server-deleted", _user.servers);
+    });
 
     await server.remove();
 
@@ -202,7 +247,7 @@ exports.addMember = async (req, res) => {
       return res.status(404).json({ error: true, message: "user not found" });
     }
 
-    if (!user.isVarified) {
+    if (!user.isVerified) {
       return res
         .status(404)
         .json({ error: true, message: "user not varified" });
@@ -212,10 +257,22 @@ exports.addMember = async (req, res) => {
       return res.status(404).json({ error: true, message: "server not found" });
     }
 
+    server.members.map((member) => {
+      if (String(member) == userid) {
+        return res
+          .status(404)
+          .json({ error: true, message: "user already member of this server" });
+      }
+    });
     server.members.push(userid);
     await server.save();
-    user.servers.push(serverid);
+    user.servers.push({ server_id: serverid, server_name: server.server_name });
     await user.save();
+
+    io.to(String(userid)).emit("server-added", {
+      server_id: server._id,
+      server_name: server.server_name,
+    });
 
     res.status(200).json({ error: false, message: "member added" });
   } catch (error) {
@@ -236,7 +293,7 @@ exports.removeMember = async (req, res) => {
 
     var members = server.memebers;
     const userIndex = members.findIndex((member) => member._id == userid);
-    if (roomIndex == -1) {
+    if (userIndex == -1) {
       return res
         .status(404)
         .json({ error: true, message: "user is not a memeber of this server" });
@@ -244,16 +301,18 @@ exports.removeMember = async (req, res) => {
     server.memebers.splice(userIndex, 1);
     await server.save();
 
-    res.status(200).json({ error: false, message: "member removed from the server" });
+    res
+      .status(200)
+      .json({ error: false, message: "member removed from the server" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: true, message: error.message });
   }
 };
 
-exports.updateServer = async (req, res) => {
+exports.renameServer = async (req, res) => {
   try {
-    const servername = req.query.new_name;
+    const servername = req.query.server_name;
     const serverid = req.query.server_id;
 
     const user = req.user;
@@ -268,10 +327,79 @@ exports.updateServer = async (req, res) => {
         .status(404)
         .json({ error: true, message: "Only owner can rename the server" });
     }
-    server.name = servername;
+    server.server_name = servername;
     await server.save();
 
     res.status(200).json({ error: false, message: "server name updated" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+exports.renameRoom = async (req, res) => {
+  try {
+    const roomName = req.query.room_name;
+    const serverid = req.query.server_id;
+    const roomID = req.query.room_id;
+    const user = req.user;
+
+    var server = await Server.findOne({ _id: serverid });
+    if (!server) {
+      return res.status(404).json({ error: true, message: "server not found" });
+    }
+
+    if (String(server.owner) !== String(user.id)) {
+      return res
+        .status(404)
+        .json({ error: true, message: "Only owner can rename the server" });
+    }
+
+    server.rooms.filter((room) => {
+      if (room._id == roomID) {
+        room.room_name = roomName;
+      }
+    });
+    await server.save();
+
+    res.status(200).json({ error: false, message: "room name updated" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: true, message: error.message });
+  }
+};
+
+exports.renameChannel = async (req, res) => {
+  try {
+    const channelName = req.query.channel_name;
+    const channelID = req.query.channel_id;
+    const serverid = req.query.server_id;
+    const roomID = req.query.room_id;
+    const user = req.user;
+
+    var server = await Server.findOne({ _id: serverid });
+    if (!server) {
+      return res.status(404).json({ error: true, message: "server not found" });
+    }
+
+    if (String(server.owner) !== String(user.id)) {
+      return res
+        .status(404)
+        .json({ error: true, message: "Only owner can rename the server" });
+    }
+
+    server.rooms.filter((room) => {
+      if (room._id == roomID) {
+        room.channels.filter((channel) => {
+          if (channel._id == channelID) {
+            channel.channel_name = channelName;
+          }
+        });
+      }
+    });
+    await server.save();
+
+    res.status(200).json({ error: false, message: "room name updated" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: true, message: error.message });
