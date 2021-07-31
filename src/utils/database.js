@@ -10,6 +10,7 @@ exports.connectDB = () => {
   });
 
   const connection = mongoose.connection;
+
   connection.once("open", () => {
     console.log("MongoDB --  database connection established successfully!");
 
@@ -66,7 +67,6 @@ exports.connectDB = () => {
     conversationChangeStream.on("change", (change) => {
       switch (change.operationType) {
         case "insert":
-          console.log(change.fullDocument.channel_id);
           io.to(String(change.fullDocument.channel_id)).emit(
             "new-conversation",
             change.fullDocument

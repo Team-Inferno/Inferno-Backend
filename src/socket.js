@@ -8,23 +8,24 @@ io.on("connection", function (socket) {
 
 
   socket.on("text-message", (channel_id) => {
-    console.log("text " + channel_id);
     socket.join(channel_id);
   });
 
   socket.on("new-server-added", (user_id) => {
-    console.log("new server addeed" + user_id);
     socket.join(user_id);
   });
 
   socket.on("server-update", (server_id) => {
-    console.log("server update" + server_id);
     socket.join(server_id);
   });
 
   socket.on("delete-server", (user_id) => {
-    console.log("delete server" + user_id);
     socket.join(user_id);
+  });
+
+  socket.on("voice-channel", (channel_id) => {
+    socket.join(channel_id);
+    console.log("user joined to channel  " +channel_id);
   });
 
   socket.on("disconnect", () => {

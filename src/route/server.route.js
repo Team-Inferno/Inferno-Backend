@@ -14,8 +14,13 @@ const {
   getServer,
   renameRoom,
   renameChannel,
+  getServerName,
 } = require("../controller/server.controller");
 
+router.get(
+  "/name",
+  getServerName
+);
 
 router.get(
   "/",

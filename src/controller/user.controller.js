@@ -6,6 +6,34 @@ exports.index = async function (req, res) {
   res.status(200).json({ users });
 };
 
+exports.getProfile = async function (req, res) {
+  try {
+    const id = req.query.user_id;
+
+    const user = await User.findOne({ _id: id });
+
+    if (!user) return res.status(401).json({ message: "User does not exist" });
+    res.status(200).json({ email: user.email, username: user.username, invites: user.invites, id: user._id });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getInvites = async function (req, res) {
+  try {
+    const id = req.query.user_id;
+
+    const user = await User.findOne({ _id: id });
+
+    if (!user) return res.status(401).json({ message: "User does not exist" });
+    res.status(200).json({ invites: user.invites });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.getServers = async function (req, res) {
   try {
     const id = req.query.user_id;
@@ -19,6 +47,22 @@ exports.getServers = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.getName = async function (req,res) {
+  try {
+    const id = req.query.user_id;
+
+    const user = await User.findOne({ _id: id });
+
+    if (!user) return res.status(401).json({ message: "User does not exist" });
+    res
+      .status(200)
+      .json(user.username);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+}
 
 
 exports.removeServer = async function (req, res) {

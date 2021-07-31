@@ -40,17 +40,29 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       required: false,
     },
+    invites: [
+      {
+        sender_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        server_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Server",
+        },
+      },
+      { timestamps: true },
+    ],
     servers: [
       {
         server_id: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "Server",
         },
-        server_name:{
+        server_name: {
           type: String,
-          required: true
+          required: true,
         },
-        
       },
     ],
   },
@@ -81,8 +93,10 @@ UserSchema.methods.comparePassword = function (password) {
 
 UserSchema.methods.generateJWT = function () {
   const today = new Date();
+  console.log(today.getTime()/1000);
   const expirationDate = new Date(today);
-  expirationDate.setDate(today.getDate() + 60);
+  expirationDate.setDate(today.getDate() + 0.1);
+  console.log(expirationDate.getTime()/1000);
 
   let payload = {
     id: this._id,
