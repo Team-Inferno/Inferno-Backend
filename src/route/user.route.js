@@ -8,6 +8,7 @@ router.get("/server", User.getServers);
 router.get("/profile", User.getProfile);
 router.get("/invites", User.getInvites);
 router.get("/name", User.getName);
+router.post("/name", User.setName);
 
 
 module.exports = router;

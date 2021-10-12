@@ -26,7 +26,6 @@ io.on("connection", function (socket) {
     socket.broadcast.to(channelID).emit("voice-channel-joined", userID);
     socket.join(channelID);
     console.log(userID+ " joined");
-    
   });
 
   socket.on("leave-voice-channel", ({ channel_id, userID }) => {

@@ -65,16 +65,18 @@ exports.acceptInvitation = async function (req, res) {
     }
 
     const memberIndex = server.members.findIndex(
-      (member) => String(member) == user._id
+      (member) => String(member) == userID
     );
-    if (memberIndex != -1) {
+    console.log("memberIndex", memberIndex)
+    if (memberIndex == -1) {
       server.members.push(userID);
     }
 
     const serverIndex = user.servers.findIndex(
       (server) => server.server_id === serverID
     );
-    if (serverIndex != -1) {
+    console.log("serverIndex", serverIndex)
+    if (serverIndex == -1) {
       user.servers.push({
         server_id: serverID,
         server_name: server.server_name,

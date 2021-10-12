@@ -1,7 +1,6 @@
 const Server = require("../model/server.model");
 const User = require("../model/user.model");
 
-
 exports.joinVoiceChannel = async function (req, res) {
   try {
     const channelID = req.query.channel_id;
@@ -36,17 +35,17 @@ exports.joinVoiceChannel = async function (req, res) {
         .json({ message: "user already joined this voice channel" });
     }
 
+    
     server.rooms[roomIndex].channels[channelIndex].subscribers.push(userID);
-
+    const subs = server.rooms[roomIndex].channels[channelIndex].subscribers;
     await server.save();
 
-    res.status(200).json({ message: "user joined successfully" });
+    res.status(200).json({ subscribers: subs });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: error.message });
   }
 };
-
 
 exports.leaveVoiceChannel = async function (req, res) {
   try {
@@ -86,7 +85,6 @@ exports.leaveVoiceChannel = async function (req, res) {
       userIndex,
       1
     );
-
 
     await server.save();
 
