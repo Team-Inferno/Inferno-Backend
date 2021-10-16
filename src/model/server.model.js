@@ -32,27 +32,14 @@ const serverSchema = new mongoose.Schema(
 );
 
 serverSchema.pre("save", async function (next) {
-  var server = this;
+  /*var server = this;
 
   if (server.isModified("rooms")) {
-    return next();
-  }
+    console.log("gg");
+    next();
+  }*/
 
-  var newTextChannel = new channel.TextChannel({
-    channel_name: "text-channel",
-  });
-
-  var newVoiceChannel = new channel.VoiceChannel({
-    channel_name: "voice-channel",
-    subscribers: [server.owner],
-  });
-
-  await server.rooms.push(
-    new Room({
-      room_name: "General",
-      channels: [newTextChannel, newVoiceChannel],
-    })
-  );
+  
 
   next();
 });

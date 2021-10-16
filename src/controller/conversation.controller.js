@@ -8,7 +8,6 @@ exports.getConversation = async (req, res) => {
   try {
     const channelid = req.query.channel_id;
     var conversation = await Conversation.find({ channel_id: channelid });
-    console.log(conversation.length);
     res.status(200).json(conversation);
   } catch (error) {
     console.log(error);
