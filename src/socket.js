@@ -22,10 +22,10 @@ io.on("connection", function (socket) {
     socket.join(user_id);
   });
 
-  socket.on("join-voice-channel", ({ channelID, userID}) => {
+  socket.on("join-voice-channel", ({ channelID, userID }) => {
     socket.broadcast.to(channelID).emit("voice-channel-joined", userID);
     socket.join(channelID);
-    console.log(userID+ " joined");
+    console.log(userID + " joined");
   });
 
   socket.on("leave-voice-channel", ({ channel_id, userID }) => {
@@ -34,6 +34,19 @@ io.on("connection", function (socket) {
 
   socket.on("disconnect", () => {
     console.log("socket.io: User disconnected: ", socket.id);
+  });
+
+  socket.on("streamer", (streamer_id) => {
+    socket.join(streamer_id);
+  });
+
+  socket.on("end-stream", ({ streamer_id}) => {
+    //console.log(streaming_id);
+    io.in(streamer_id).emit("stream-ended", streamer_id);
+  });
+
+  socket.on("streamer-streaming", ({streamer_id, streaming_id}) => {
+    io.in(streamer_id).emit("stream-started", streaming_id);
   });
 });
 

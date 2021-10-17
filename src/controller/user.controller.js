@@ -19,6 +19,7 @@ exports.getProfile = async function (req, res) {
         username: user.username,
         invites: user.invites,
         id: user._id,
+        streamer: user.streamer
       });
   } catch (error) {
     console.log(error.message);
@@ -62,6 +63,34 @@ exports.getName = async function (req, res) {
 
     if (!user) return res.status(401).json({ message: "User does not exist" });
     res.status(200).json(user.username);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.isStreamer = async function (req, res) {
+  try {
+    const id = req.query.user_id;
+
+    const user = await User.findOne({ _id: id });
+
+    if (!user) return res.status(401).json({ message: "User does not exist" });
+    res.status(200).json(user.streamer);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getStreamerList = async function (req, res) {
+  try {
+    const id = req.query.user_id;
+
+    const user = await User.findOne({ _id: id });
+
+    if (!user) return res.status(401).json({ message: "User does not exist" });
+    res.status(200).json(user.following);
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: error.message });
@@ -118,3 +147,5 @@ exports.setName = async function (req, res) {
     res.status(500).json({ message: error.message });
   }
 };
+
+

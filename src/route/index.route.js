@@ -5,6 +5,7 @@ const room = require("./room.route");
 const invite = require("./invite.route");
 const conversation = require("./conversation.route");
 const channel = require("./channel.route");
+const stream = require("./stream.route");
 
 const authenticate = require("../middleware/authenticate");
 
@@ -22,5 +23,7 @@ module.exports = (app) => {
   app.use("/api/invite", authenticate, invite);
   app.use("/api/conversation", authenticate, conversation);
   app.use("/api/channel", authenticate, channel);
+  app.use("/api/stream", authenticate, stream);
+
 
 };

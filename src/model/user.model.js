@@ -26,6 +26,52 @@ const UserSchema = new mongoose.Schema(
       max: 100,
     },
 
+    streamer: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
+
+    followers: [
+    
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+
+      { timestamps: true },
+    
+    ],
+
+    following: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+
+      { timestamps: true },
+    ],
+
+    current_stream_id: {
+      type: String,
+      default: null,
+    },
+
+    streams: [
+      {
+        stream_id: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Stream",
+        },
+      },
+      { timestamps: true },
+    ],
+
+    streamer_description: {
+      type: String,
+      required: false,
+    },
+
     isVerified: {
       type: Boolean,
       default: false,
@@ -93,10 +139,10 @@ UserSchema.methods.comparePassword = function (password) {
 
 UserSchema.methods.generateJWT = function () {
   const today = new Date();
-  console.log(today.getTime()/1000);
+  console.log(today.getTime() / 1000);
   const expirationDate = new Date(today);
   expirationDate.setDate(today.getDate() + 0.1);
-  console.log(expirationDate.getTime()/1000);
+  console.log(expirationDate.getTime() / 1000);
 
   let payload = {
     id: this._id,

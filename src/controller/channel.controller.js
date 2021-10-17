@@ -1,5 +1,6 @@
 const Server = require("../model/server.model");
 const User = require("../model/user.model");
+const Channel = require("../model/channel.model");
 
 exports.joinVoiceChannel = async function (req, res) {
   try {
@@ -119,11 +120,11 @@ exports.createChannel = async (req, res) => {
     }
     var newChannel;
     if (channeltype == "text") {
-      newChannel = new channel.TextChannel({
+      newChannel = new Channel.TextChannel({
         channel_name: channelname,
       });
     } else {
-      newChannel = new channel.VoiceChannel({
+      newChannel = new Channel.VoiceChannel({
         channel_name: channelname,
       });
     }
