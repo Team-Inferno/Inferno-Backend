@@ -59,7 +59,7 @@ exports.createServer = async (req, res) => {
 
     var newVoiceChannel = new channel.VoiceChannel({
       channel_name: "voice-channel",
-      subscribers: [ownerID],
+      subscribers: [],
     });
 
     await newServer.rooms.push(
